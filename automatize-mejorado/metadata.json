@@ -1,0 +1,6 @@
+{
+  "name": "BUHEE - Análisis de Sábanas Telefónicas",
+  "description": "Sistema forense BUHEE para análisis de registros telefónicos (CDR) y geolocalización de antenas para unidades antisecuestros (Cd. Juárez).",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

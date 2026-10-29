@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BUHEE - Análisis de Sábanas Telefónicas (Cd. Juárez)</title>
+    <meta name="description" content="Sistema forense BUHEE para análisis de registros telefónicos (CDR) y geolocalización de antenas para unidades antisecuestros (Cd. Juárez)." />
+    <meta property="og:title" content="BUHEE - Análisis de Sábanas Telefónicas" />
+    <meta property="og:description" content="Sistema forense BUHEE para análisis de registros telefónicos (CDR) y geolocalización de antenas para unidades antisecuestros (Cd. Juárez)." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+  </head>
+  <body class="login-bg">
+    <div class="text-center text-white p-5">
+      <div class="spinner-border text-light mb-3" role="status"></div>
+      <h4>Iniciando BUHEE Cd. Juárez...</h4>
+      <p class="text-white-50">Verificando credenciales de acceso y cadena de custodia...</p>
+    </div>
+
+    <script type="module">
+      import { auth } from './auth.js';
+      if (auth.isAuthenticated()) {
+        window.location.replace('dashboard.html');
+      } else {
+        window.location.replace('login.html');
+      }
+    </script>
+  </body>
+</html>
+

@@ -1,0 +1,46 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Función auxiliar para verificar autenticación y rol
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function getUserRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && getUserRole() == 'admin';
+    }
+    
+    function isAnalystOrAbove() {
+      return isAuthenticated() && (getUserRole() in ['admin', 'analyst']);
+    }
+
+    function isAuditorOrAbove() {
+      return isAuthenticated() && (getUserRole() in ['admin', 'auditor', 'analyst']);
+    }
+
+    // Colección de Usuarios: Solo lectura para autenticados, modificación solo por Admin
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin() || (isAuthenticated() && request.auth.uid == userId);
+    }
+
+    // Colección de Registros CDR (Sábanas): Lectura para analistas/auditores, escritura para analistas/admin
+    match /records/{recordId} {
+      allow read: if isAuditorOrAbove();
+      allow create, update: if isAnalystOrAbove();
+      allow delete: if isAdmin();
+    }
+
+    // Bitácora de Auditoría Forense: Inmutable (solo inserción, nunca actualización ni borrado)
+    match /audit_log/{logId} {
+      allow read: if isAuditorOrAbove();
+      allow create: if isAuthenticated();
+      allow update, delete: if false; // Inmutabilidad forense estricta
+    }
+  }
+}

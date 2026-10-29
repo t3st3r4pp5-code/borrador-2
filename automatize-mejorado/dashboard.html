@@ -1,0 +1,1566 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BUHEE | Sistema Forense de Telecomunicaciones</title>
+
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <!-- Estilos Maestros Forenses -->
+  <link rel="stylesheet" href="./main.css" />
+</head>
+<body>
+  <!-- PANTALLA DE CARGA / SPLASH SCREEN BUHEE CON MÁSCARA DE BÚHO -->
+  <div id="cdddm-splash-overlay">
+    <div class="splash-content-box">
+      <div class="text-white-50 text-uppercase tracking-wider small fw-bold mb-1">
+        <i class="bi bi-eye-fill text-danger me-1"></i> DIVISIÓN DE INTELIGENCIA FORENSE BUHEE
+      </div>
+      <h6 class="text-white fw-bold mb-0">UNIDAD ESPECIALIZADA EN COMBATE AL SECUESTRO</h6>
+      <div class="text-danger small font-monospace mt-1">SISTEMA BUHEE • VIGILANCIA Y ANÁLISIS CDR • JUÁREZ, CHIH.</div>
+      <div class="splash-scan-bar"></div>
+    </div>
+  </div>
+
+  <div class="app-wrapper">
+    <!-- BARRA LATERAL (SIDEBAR) -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="d-flex align-items-center gap-2">
+          <img src="./buhee-icon.jpg" alt="BUHEE" class="rounded border border-danger shadow-sm" style="width: 38px; height: 38px; object-fit: cover;" />
+          <div>
+            <div class="fw-bold tracking-wide text-white fs-5" style="letter-spacing: 1px;">BUHEE</div>
+            <div class="badge-official">UECS JUÁREZ</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Menú de Navegación -->
+      <ul class="nav-forensic">
+        <li class="nav-item">
+          <a class="nav-link active" data-target-view="dashboard">
+            <i class="bi bi-grid-1x2-fill"></i>
+            <span>Tablero General</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-target-view="import">
+            <i class="bi bi-cloud-arrow-up-fill"></i>
+            <span>Importar Sábana</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-target-view="explorer">
+            <i class="bi bi-table"></i>
+            <span>Explorador CDR</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-target-view="analyzer">
+            <i class="bi bi-telephone-inbound-fill"></i>
+            <span>Análisis por Número</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-target-view="comparator">
+            <i class="bi bi-diagram-3-fill"></i>
+            <span>Comparador / Vínculos</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-target-view="network">
+            <i class="bi bi-diagram-2-fill text-warning"></i>
+            <span>Red de Vínculos (i2)</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-target-view="multisheet">
+            <i class="bi bi-collection-fill text-success"></i>
+            <span>Cruce Multi-Sábana</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-target-view="behavior">
+            <i class="bi bi-activity text-danger"></i>
+            <span>Comportamiento Celular</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-target-view="map">
+            <i class="bi bi-geo-alt-fill"></i>
+            <span>Mapa & Timeline</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-target-view="custody">
+            <i class="bi bi-shield-check text-warning"></i>
+            <span>Hash & Cadena Custodia</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-target-view="osint">
+            <i class="bi bi-person-vcard-fill text-info"></i>
+            <span>Ficha OSINT / PIWEB</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-target-view="vehicle">
+            <i class="bi bi-car-front-fill text-secondary"></i>
+            <span>Placas / Vehículos</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-target-view="reports">
+            <i class="bi bi-file-earmark-pdf-fill"></i>
+            <span>Dictamen Pericial</span>
+          </a>
+        </li>
+        <li class="nav-item" id="nav-item-admin">
+          <a class="nav-link" data-target-view="admin">
+            <i class="bi bi-people-fill"></i>
+            <span>Panel Admin / Auditoría</span>
+          </a>
+        </li>
+      </ul>
+
+      <!-- Pie del Sidebar -->
+      <div class="sidebar-footer">
+        <div class="d-flex align-items-center justify-content-between text-white-50 small mb-2">
+          <span>Caso Activo:</span>
+          <span class="badge bg-danger text-truncate" style="max-width: 120px;" id="sidebar-active-case">EXP-2026-084</span>
+        </div>
+        <button id="btn-logout" class="btn btn-sm btn-outline-light w-100 d-flex align-items-center justify-content-center gap-2">
+          <i class="bi bi-box-arrow-right"></i>
+          <span>Cerrar Sesión</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Overlay backdrop para móvil -->
+    <div class="sidebar-backdrop"></div>
+
+    <!-- ÁREA DE CONTENIDO PRINCIPAL -->
+    <main class="main-content">
+      <!-- Barra Superior -->
+      <header class="top-navbar">
+        <div class="d-flex align-items-center gap-2">
+          <!-- Botón Hamburguesa Móvil -->
+          <button id="btn-sidebar-toggle" class="btn btn-sm btn-outline-secondary d-lg-none" title="Abrir menú">
+            <i class="bi bi-list fs-5"></i>
+          </button>
+
+          <label class="small text-muted fw-bold d-none d-md-inline">Expediente:</label>
+          <select id="global-case-selector" class="form-select form-select-sm" style="max-width: 220px;">
+            <option value="EXP-2026-084-SEC" selected>EXP-2026-084-SEC (Secuestro Cd. Juárez)</option>
+            <option value="EXP-2026-019-EXT">EXP-2026-019-EXT (Extorsión Pronaf)</option>
+            <option value="EXP-2026-092-INV">EXP-2026-092-INV (Célula Las Torres)</option>
+          </select>
+        </div>
+
+        <div class="d-flex align-items-center gap-3">
+          <!-- Conmutador de Tamaño de Fuente -->
+          <div class="btn-group btn-group-sm" role="group" title="Tamaño de Fuente">
+            <button type="button" class="btn btn-outline-secondary" data-font-size="sm">A-</button>
+            <button type="button" class="btn btn-outline-secondary" data-font-size="md">A</button>
+            <button type="button" class="btn btn-outline-secondary" data-font-size="lg">A+</button>
+          </div>
+
+          <!-- Conmutador Tema Claro/Oscuro -->
+          <button id="theme-toggle-btn" class="btn btn-sm btn-outline-secondary" title="Cambiar tema">
+            <i id="theme-icon" class="bi bi-moon-stars-fill"></i>
+          </button>
+
+          <!-- Perfil del Oficial Conectado -->
+          <div class="vr mx-1"></div>
+          <div class="d-flex align-items-center gap-2">
+            <div class="text-end d-none d-sm-block">
+              <div class="fw-bold small" id="user-display-name">Cargando Oficial...</div>
+              <div class="text-muted" style="font-size: 11px;">Gafete: <span id="user-badge-number">CHIH-UECS</span></div>
+            </div>
+            <span class="badge bg-danger" id="user-role-badge">ADMIN</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- CUERPO DE LAS VISTAS -->
+      <div class="content-body">
+        
+        <!-- VISTA 1: DASHBOARD -->
+        <section id="view-dashboard" class="view-section">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h4 class="fw-bold text-navy mb-1">Tablero de Inteligencia Táctica</h4>
+              <p class="text-muted small mb-0">Resumen forense consolidado para la Unidad Antisecuestros (Cd. Juárez)</p>
+            </div>
+            <button class="btn btn-sm btn-primary" onclick="window.sabtelApp.switchView('import')">
+              <i class="bi bi-cloud-arrow-up-fill me-1"></i> Importar Nueva Sábana
+            </button>
+          </div>
+
+          <!-- Tarjetas KPI -->
+          <div class="row g-3 mb-4">
+            <div class="col-md-3 col-sm-6">
+              <div class="stat-card stat-navy">
+                <div class="text-muted small text-uppercase fw-bold">Registros CDR Totales</div>
+                <div class="fs-3 fw-bold text-navy my-1" id="kpi-total-records">0</div>
+                <div class="small text-muted"><i class="bi bi-database me-1"></i>En base local / Firestore</div>
+              </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+              <div class="stat-card stat-danger">
+                <div class="text-muted small text-uppercase fw-bold">Números Telefónicos Únicos</div>
+                <div class="fs-3 fw-bold text-danger my-1" id="kpi-unique-origins">0</div>
+                <div class="small text-muted"><i class="bi bi-people me-1"></i>Abonados en la red</div>
+              </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+              <div class="stat-card stat-warning">
+                <div class="text-muted small text-uppercase fw-bold">Antenas / Celdas Identificadas</div>
+                <div class="fs-3 fw-bold text-warning my-1" id="kpi-active-antennas">0</div>
+                <div class="small text-muted"><i class="bi bi-broadcast me-1"></i>Sectores en Cd. Juárez</div>
+              </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+              <div class="stat-card stat-info">
+                <div class="text-muted small text-uppercase fw-bold">Expedientes en Análisis</div>
+                <div class="fs-3 fw-bold text-info my-1" id="kpi-expeditions">1</div>
+                <div class="small text-muted"><i class="bi bi-folder-fill me-1"></i>Causas penales vigentes</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Gráficos -->
+          <div class="row g-3 mb-4">
+            <div class="col-lg-8">
+              <div class="card-forensic p-3 h-100">
+                <div class="card-header border-0 pb-2 pt-0 px-0 d-flex justify-content-between align-items-center">
+                  <span class="fw-bold">Patrón Horario de Comunicaciones (24 Horas)</span>
+                  <span class="badge bg-danger small">Atención en Picos 00:00 - 05:00</span>
+                </div>
+                <div style="height: 280px;">
+                  <canvas id="chart-hourly-activity"></canvas>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-4">
+              <div class="card-forensic p-3 h-100">
+                <div class="card-header border-0 pb-2 pt-0 px-0">
+                  <span class="fw-bold">Distribución por Servicio</span>
+                </div>
+                <div style="height: 280px;">
+                  <canvas id="chart-event-types"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Top Números Más Activos -->
+          <div class="card-forensic">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <span>Top 5 Números con Mayor Tráfico en el Expediente</span>
+              <button class="btn btn-sm btn-link text-decoration-none" onclick="window.sabtelApp.switchView('explorer')">Ver todos en Explorador &rarr;</button>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-forensic align-middle">
+                <thead>
+                  <tr>
+                    <th>Ranking</th>
+                    <th>Número Origen</th>
+                    <th>Operador</th>
+                    <th>Volumen Total</th>
+                    <th>Tiempo Hablado</th>
+                  </tr>
+                </thead>
+                <tbody id="dashboard-top-numbers">
+                  <tr><td colspan="5" class="text-center py-3">Cargando registros...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- VISTA 2: IMPORTACIÓN DE SÁBANAS (CSV, EXCEL XLSX/XLS, PDF FORENSE) -->
+        <section id="view-import" class="view-section d-none">
+          <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+            <div>
+              <h4 class="fw-bold text-navy mb-1">
+                <i class="bi bi-cloud-arrow-up-fill text-primary me-1"></i> Ingestión y Mapeo Universal de Sábanas
+              </h4>
+              <p class="text-muted small mb-0">
+                Soporte nativo para <strong>CSV</strong> (comas, punto y coma, tabulador), <strong>Excel (.xlsx, .xls)</strong> y <strong>PDF Forense (.pdf)</strong>
+              </p>
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+              <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#importFormatsModal">
+                <i class="bi bi-question-circle-fill me-1"></i> Guía de Formatos
+              </button>
+              <button id="btn-download-csv-template" class="btn btn-sm btn-outline-success">
+                <i class="bi bi-file-earmark-spreadsheet me-1"></i> Plantilla Excel/CSV
+              </button>
+              <button id="btn-load-sample-627" class="btn btn-sm btn-outline-primary" title="Caso con 1 sola línea investigada + interlocutores y sesiones de datos 3600s">
+                <i class="bi bi-diagram-3-fill me-1"></i> Caso UAYC 6271218386
+              </button>
+              <button id="btn-load-sample-sheet" class="btn btn-sm btn-outline-danger">
+                <i class="bi bi-lightning-charge-fill me-1"></i> Caso Juárez General
+              </button>
+            </div>
+          </div>
+
+          <!-- Catálogo de antenas: resuelve coordenadas cuando la sábana solo trae el ID de celda -->
+          <div class="card-forensic p-3 mb-3">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+              <div>
+                <strong><i class="bi bi-broadcast me-1 text-primary"></i> Base de antenas</strong>
+                <span class="badge bg-secondary ms-1" id="catalog-count-badge">0 celdas</span>
+                <div class="small text-muted">Las sábanas suelen traer solo el ID de celda. Cargue el catálogo (CSV con id_celda, latitud, longitud) <strong>antes</strong> de importar; las celdas que no estén quedan sin coordenada, no se inventan. Cada sábana que sí trae coordenadas agrega sus celdas a esta base.</div>
+              </div>
+              <div class="d-flex flex-wrap gap-2 align-items-center">
+                <input type="file" id="catalog-file-input" accept=".csv,.txt" class="form-control form-control-sm" style="max-width: 240px;" />
+                <button id="btn-load-sample-catalog" class="btn btn-sm btn-outline-primary">Catálogo sintético</button>
+                <button id="btn-export-catalog" class="btn btn-sm btn-outline-success"><i class="bi bi-download"></i> Exportar base (CSV)</button>
+                <a href="demo/operador_A_sintetico.csv" download class="btn btn-sm btn-outline-secondary" title="Sábana sintética sin coordenadas para probar el catálogo">Sábana sin coordenadas (ejemplo)</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pestañas de Modo de Ingestión -->
+          <ul class="nav nav-tabs mb-3" id="importModeTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active fw-bold text-navy" id="tab-file-import" data-bs-toggle="tab" data-bs-target="#panel-file-import" type="button" role="tab">
+                <i class="bi bi-file-earmark-arrow-up me-1"></i> Cargar Archivo (CSV / Excel / PDF)
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link fw-bold text-navy" id="tab-ocr-import" data-bs-toggle="tab" data-bs-target="#panel-ocr-import" type="button" role="tab">
+                <i class="bi bi-file-text me-1"></i> Pegar Texto / OCR de PDF
+              </button>
+            </li>
+          </ul>
+
+          <div class="tab-content" id="importTabContent">
+            <!-- PANEL 1: CARGA DE ARCHIVO -->
+            <div class="tab-pane fade show active" id="panel-file-import" role="tabpanel">
+              <!-- Paso 1: Selección de Archivo y Metadatos -->
+              <div class="card-forensic mb-4">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                  <strong>Paso 1: Archivo y Metadatos de la Investigación</strong>
+                  <span class="badge bg-secondary font-monospace" id="import-detected-format-badge">Listo para carga</span>
+                </div>
+                <div class="p-4">
+                  <!-- Zona Drag & Drop -->
+                  <div id="import-drop-zone" class="border border-2 border-dashed rounded p-4 text-center bg-light mb-3 cursor-pointer" style="transition: all 0.2s ease;">
+                    <div class="mb-2">
+                      <i class="bi bi-cloud-arrow-up-fill fs-1 text-primary"></i>
+                    </div>
+                    <h6 class="fw-bold text-navy mb-1">Arrastre y suelte aquí su archivo de sábana telefónica</h6>
+                    <p class="text-muted small mb-2">
+                      Formatos compatibles: <strong>CSV</strong> (comas <code>,</code> o punto y coma <code>;</code>), <strong>Excel (.xlsx, .xls)</strong> y <strong>Documentos PDF (.pdf)</strong>
+                    </p>
+                    <div class="d-flex justify-content-center gap-2 mb-2">
+                      <span class="badge bg-primary">CSV Delimitado</span>
+                      <span class="badge bg-success">Excel XLSX/XLS</span>
+                      <span class="badge bg-danger">PDF Forense Telcel/i2</span>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-primary px-3" onclick="document.getElementById('import-file-input').click()">
+                      <i class="bi bi-folder2-open me-1"></i> Seleccionar Archivo desde su Dispositivo
+                    </button>
+                  </div>
+
+                  <div class="row g-3">
+                    <div class="col-md-4">
+                      <label class="form-label fw-bold text-navy small mb-1">Número de Causa Penal / Expediente:</label>
+                      <input type="text" id="import-expedition-id" class="form-control form-control-sm" value="EXP-2026-084-SEC" />
+                      <small class="text-muted" style="font-size: 11px;">Identificador de la indagatoria en Fiscalía.</small>
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label fw-bold text-navy small mb-1">Etiqueta de la Sábana (Multi-Sábana):</label>
+                      <input type="text" id="import-sheet-label" class="form-control form-control-sm" placeholder="Ej. Sábana Sospechoso 1 (Línea de Rescate)" />
+                      <small class="text-muted" style="font-size: 11px;">Identificador distintivo para cruces de múltiples sábanas.</small>
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label fw-bold text-navy small mb-1">
+                        Línea Investigada / Objetivo (10 dígitos):
+                        <span class="badge bg-info text-dark ms-1" style="font-size: 10px;">Auto-detectable</span>
+                      </label>
+                      <input type="text" id="import-target-phone" class="form-control form-control-sm font-monospace" placeholder="Ej. 6271218386" />
+                      <small class="text-muted" style="font-size: 11px;">Requerido en sábanas de 1 solo abonado (Telcel/AT&T/i2).</small>
+                    </div>
+
+                    <div class="col-12">
+                      <label class="form-label fw-bold text-navy small mb-1">Entrada de Archivo Directa:</label>
+                      <input type="file" id="import-file-input" class="form-control" accept=".csv, .txt, .xlsx, .xls, .pdf, .tsv" />
+                      <div class="d-flex justify-content-between align-items-center mt-1">
+                        <small class="text-muted" id="import-status-text">Formatos aceptados: .csv (cualquier delimitador), .xlsx, .xls, .pdf, .txt</small>
+                        <small class="text-muted font-monospace" id="import-file-size-info"></small>
+                      </div>
+                    </div>
+
+                    <div class="col-12 d-none" id="import-file-hash-info"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- PANEL 2: PEGAR TEXTO / OCR -->
+            <div class="tab-pane fade" id="panel-ocr-import" role="tabpanel">
+              <div class="card-forensic mb-4">
+                <div class="card-header bg-light">
+                  <strong>Extracción Directa de Texto / Escaneo OCR de PDF</strong>
+                </div>
+                <div class="p-4">
+                  <p class="small text-muted mb-2">
+                    Si tiene un PDF escaneado o copió el texto directamente desde un lector de PDF o documento de Word/Excel, péguelo a continuación. El motor extraerá números telefónicos, fechas, horas, eventos y antenas automáticamente.
+                  </p>
+                  <div class="mb-3">
+                    <label class="form-label fw-bold text-navy small">Texto Crudo o Tabla Copiada:</label>
+                    <textarea id="import-ocr-text" class="form-control font-monospace" rows="8" placeholder="Ejemplo:&#10;22/01/2025 11:44:49  6271134588  LL-E  180  Telcel  JUAR-01_CENTRO  31.7380  -106.4850&#10;22/01/2025 11:51:42  6271134588  LL-S  45   Telcel  JUAR-01_CENTRO  31.7380  -106.4850&#10;Datos 22/01/2025 00:26:42 95 3600 internet.itelcel.com"></textarea>
+                  </div>
+                  <div class="row g-2 align-items-center">
+                    <div class="col-md-4">
+                      <label class="form-label fw-bold text-navy small mb-1">Línea Investigada (Objetivo):</label>
+                      <input type="text" id="import-ocr-target" class="form-control form-control-sm font-monospace" placeholder="Ej. 6271218386" value="6271218386" />
+                    </div>
+                    <div class="col-md-8 text-end pt-3">
+                      <button id="btn-process-ocr-text" class="btn btn-primary btn-sm px-3">
+                        <i class="bi bi-cpu-fill me-1"></i> Procesar y Estructurar Texto en Filas CDR
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Paso 2: Mapeo de Columnas (Oculto al inicio) -->
+          <div id="import-step-mapping" class="card-forensic mb-4 d-none">
+            <div class="card-header bg-light d-flex flex-wrap justify-content-between align-items-center gap-2">
+              <div>
+                <strong>Paso 2: Mapeo Forense de Columnas</strong>
+                <span class="badge bg-success ms-2" id="mapping-badge-status">Auto-mapeado</span>
+              </div>
+              <div class="btn-group btn-group-sm" role="group">
+                <input type="radio" class="btn-check" name="mappingSchemaMode" id="schemaModeAuto" autocomplete="off" checked>
+                <label class="btn btn-outline-primary" for="schemaModeAuto">Detección Inteligente</label>
+
+                <input type="radio" class="btn-check" name="mappingSchemaMode" id="schemaModeManual" autocomplete="off">
+                <label class="btn btn-outline-secondary" for="schemaModeManual">Ajuste Manual</label>
+              </div>
+            </div>
+            <div class="p-4">
+              <div id="mapping-scheme-alert" class="alert alert-info py-2 px-3 small mb-3">
+                <i class="bi bi-info-circle-fill me-1"></i> Verifique que las columnas correspondan al formato de su concesionario o reporte de fiscalía.
+              </div>
+              
+              <div class="row g-3" id="column-mapping-container">
+                <!-- Se llena dinámicamente -->
+              </div>
+
+              <div class="mt-4">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <h6 class="fw-bold text-navy mb-0">Vista previa estructurada (primeras filas detectadas):</h6>
+                  <span class="badge bg-dark font-monospace" id="preview-row-count-badge">0 filas</span>
+                </div>
+                <div id="import-raw-preview" class="border rounded p-2 bg-light"></div>
+              </div>
+
+              <div class="mt-4 d-flex justify-content-between align-items-center">
+                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="document.getElementById('import-file-input').value = ''; document.getElementById('import-step-mapping').classList.add('d-none');">
+                  <i class="bi bi-arrow-left me-1"></i> Seleccionar Otro Archivo
+                </button>
+                <button id="btn-process-mapping" class="btn btn-primary px-4">
+                  <i class="bi bi-shield-check me-1"></i> Validar Registros y Buscar Duplicados
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Paso 3: Confirmación y Guardado -->
+          <div id="import-step-confirm" class="card-forensic mb-4 d-none">
+            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+              <strong>Paso 3: Validación Forense y Almacenamiento en Base de Datos</strong>
+              <span class="badge bg-success">Validación Aprobada</span>
+            </div>
+            <div class="p-4">
+              <div id="validation-summary-alert" class="alert alert-info border mb-3"></div>
+              <div class="d-flex justify-content-end gap-2">
+                <button id="btn-confirm-import" class="btn btn-success btn-lg px-4">
+                  <i class="bi bi-cloud-arrow-up-fill me-1"></i> Confirmar e Indexar Registros en SABTEL
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- VISTA 3: EXPLORADOR CDR -->
+        <section id="view-explorer" class="view-section d-none">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <h4 class="fw-bold text-navy mb-1">
+                <i class="bi bi-table text-primary me-1"></i> Explorador de Registros CDR
+              </h4>
+              <p class="text-muted small mb-0">Inspección granular de eventos telefónicos con filtros por fecha, hora y paginación de alta velocidad</p>
+            </div>
+            <div class="d-flex gap-2">
+              <button class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#explorerInstructionModal">
+                <i class="bi bi-info-circle-fill me-1"></i> Instrucciones de Uso
+              </button>
+              <button id="btn-export-explorer-csv" class="btn btn-sm btn-outline-success">
+                <i class="bi bi-file-earmark-spreadsheet me-1"></i> Exportar a CSV
+              </button>
+            </div>
+          </div>
+
+          <!-- Filtros de Búsqueda, Fecha y Hora -->
+          <div class="card-forensic p-3 mb-3">
+            <!-- Fila 1: Números y Tipos -->
+            <div class="row g-2 mb-2">
+              <div class="col-md-3">
+                <label class="form-label small fw-bold mb-1">Búsqueda Rápida:</label>
+                <input type="text" id="filter-search-quick" class="form-control form-control-sm" placeholder="Buscar por número o celda..." />
+              </div>
+              <div class="col-md-2">
+                <label class="form-label small fw-bold mb-1">Número Origen (A):</label>
+                <input type="text" id="filter-origin" class="form-control form-control-sm" placeholder="Ej. 6561234567" />
+              </div>
+              <div class="col-md-2">
+                <label class="form-label small fw-bold mb-1">Número Destino (B):</label>
+                <input type="text" id="filter-destination" class="form-control form-control-sm" placeholder="Ej. 6569876543" />
+              </div>
+              <div class="col-md-2">
+                <label class="form-label small fw-bold mb-1">Tipo de Evento:</label>
+                <select id="filter-event-type" class="form-select form-select-sm">
+                  <option value="">Todos los Tipos</option>
+                  <option value="llamada">Llamada de Voz</option>
+                  <option value="sms">Mensaje SMS</option>
+                  <option value="datos">Tráfico Datos</option>
+                </select>
+              </div>
+              <div class="col-md-2">
+                <label class="form-label small fw-bold mb-1">Operador:</label>
+                <select id="filter-operator" class="form-select form-select-sm">
+                  <option value="">Todos los Operadores</option>
+                  <option value="Telcel">Telcel</option>
+                  <option value="AT&T">AT&T</option>
+                  <option value="Movistar">Movistar</option>
+                </select>
+              </div>
+              <div class="col-md-1">
+                <label class="form-label small fw-bold mb-1">Sentido:</label>
+                <select id="filter-direction" class="form-select form-select-sm">
+                  <option value="">Todos</option>
+                  <option value="saliente">Saliente</option>
+                  <option value="entrante">Entrante</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Fila 2: Filtros por Fecha y Filtros por Hora -->
+            <div class="row g-2 align-items-end border-top pt-2">
+              <div class="col-md-3">
+                <label class="form-label small fw-bold mb-1 text-danger">
+                  <i class="bi bi-calendar-event me-1"></i> Fecha Específica del Hecho:
+                </label>
+                <input type="date" id="filter-date-specific" class="form-control form-control-sm" title="Filtrar un solo día clave del hecho" />
+              </div>
+              <div class="col-md-2">
+                <label class="form-label small fw-bold mb-1">Fecha Desde:</label>
+                <input type="date" id="filter-date-from" class="form-control form-control-sm" />
+              </div>
+              <div class="col-md-2">
+                <label class="form-label small fw-bold mb-1">Fecha Hasta:</label>
+                <input type="date" id="filter-date-to" class="form-control form-control-sm" />
+              </div>
+              <div class="col-md-2">
+                <label class="form-label small fw-bold mb-1 text-primary">
+                  <i class="bi bi-clock-history me-1"></i> Turno / Horario Crítico:
+                </label>
+                <select id="filter-hour-preset" class="form-select form-select-sm">
+                  <option value="">Cualquier Hora (24h)</option>
+                  <option value="madrugada">🌙 Madrugada (00:00 - 05:59)</option>
+                  <option value="manana">☀️ Mañana (06:00 - 11:59)</option>
+                  <option value="tarde">⛅ Tarde (12:00 - 17:59)</option>
+                  <option value="noche">🌑 Noche (18:00 - 23:59)</option>
+                </select>
+              </div>
+              <div class="col-md-2">
+                <label class="form-label small fw-bold mb-1">Hora Rango (0-23h):</label>
+                <div class="input-group input-group-sm">
+                  <input type="number" id="filter-hour-from" class="form-control" min="0" max="23" placeholder="00" title="Hora inicial (0 a 23)" />
+                  <span class="input-group-text">-</span>
+                  <input type="number" id="filter-hour-to" class="form-control" min="0" max="23" placeholder="23" title="Hora final (0 a 23)" />
+                </div>
+              </div>
+              <div class="col-md-1">
+                <button id="btn-reset-filters" class="btn btn-sm btn-outline-secondary w-100" title="Restablecer todos los filtros">
+                  <i class="bi bi-arrow-counterclockwise me-1"></i> Limpiar
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tabla Paginada -->
+          <div class="card-forensic">
+            <div class="p-2 border-bottom d-flex justify-content-between align-items-center">
+              <span id="explorer-total-count" class="badge bg-navy fs-6">0 registros</span>
+              <div class="d-flex align-items-center gap-2">
+                <button id="btn-page-prev" class="btn btn-sm btn-outline-primary">&larr; Anterior</button>
+                <span id="explorer-page-indicator" class="small fw-bold">Página 1</span>
+                <button id="btn-page-next" class="btn btn-sm btn-outline-primary">Siguiente &rarr;</button>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="table table-forensic align-middle mb-0">
+                <thead>
+                  <tr>
+                    <th>Fecha / Hora</th>
+                    <th>Origen (A)</th>
+                    <th>Destino (B)</th>
+                    <th>Tipo</th>
+                    <th>Sentido</th>
+                    <th>Duración</th>
+                    <th>Operador</th>
+                    <th>Cell ID</th>
+                    <th class="text-center">Acción</th>
+                  </tr>
+                </thead>
+                <tbody id="explorer-table-body">
+                  <tr><td colspan="9" class="text-center py-4">Cargando sábana telefónica...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- VISTA 4: ANÁLISIS INDIVIDUAL POR NÚMERO -->
+        <section id="view-analyzer" class="view-section d-none">
+          <div class="mb-4">
+            <h4 class="fw-bold text-navy mb-1">Análisis Forense por Número Telefónico</h4>
+            <p class="text-muted small mb-0">Perfilado profundo de sospechosos, víctimas o teléfonos de rescate</p>
+          </div>
+
+          <div class="card-forensic p-4 mb-4">
+            <div class="row g-3 align-items-end">
+              <div class="col-md-6">
+                <label class="form-label fw-bold">Número telefónico bajo investigación (10 dígitos):</label>
+                <input type="text" id="analyzer-phone-input" class="form-control form-control-lg font-monospace" placeholder="Ej. 6561112233" />
+              </div>
+              <div class="col-md-4">
+                <button id="btn-run-analysis" class="btn btn-danger btn-lg w-100">
+                  <i class="bi bi-search me-1"></i> Ejecutar Perfil Forense
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Contenedor de Resultados (Oculto al inicio) -->
+          <div id="analyzer-results-container" class="d-none">
+            <div class="row g-3 mb-4">
+              <div class="col-md-4">
+                <div class="stat-card stat-navy">
+                  <div class="text-muted small text-uppercase">Blanco Investigado</div>
+                  <div class="fs-4 fw-bold text-navy" id="target-header-phone">--</div>
+                  <div class="small text-muted mt-1">Total Eventos: <strong id="target-total-events">0</strong></div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="stat-card stat-danger">
+                  <div class="text-muted small text-uppercase">Duración Acumulada</div>
+                  <div class="fs-4 fw-bold text-danger" id="target-total-duration">0m 0s</div>
+                  <div class="small text-muted mt-1">Promedio por llamada: <strong id="target-avg-duration">0s</strong></div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="stat-card stat-warning">
+                  <div class="text-muted small text-uppercase">Sentido del Tráfico</div>
+                  <div class="small mt-2">
+                    Salientes: <strong id="target-originated-count" class="text-primary">0</strong> |
+                    Entrantes: <strong id="target-received-count" class="text-success">0</strong>
+                  </div>
+                  <div class="small text-muted mt-1" id="target-last-antenna">Última celda: --</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Gráfico Horario del Número -->
+            <div class="card-forensic p-3 mb-4">
+              <div class="card-header border-0 pb-2 pt-0 px-0">
+                <span class="fw-bold">Patrón Horario Específico de este Número</span>
+              </div>
+              <div style="height: 240px;">
+                <canvas id="chart-target-hourly"></canvas>
+              </div>
+            </div>
+
+            <!-- Top 10 Contactos y Hotspots -->
+            <div class="row g-3">
+              <div class="col-lg-8">
+                <div class="card-forensic">
+                  <div class="card-header">
+                    <strong>Top 10 Contactos Más Frecuentes de este Número</strong>
+                  </div>
+                  <div class="table-responsive">
+                    <table class="table table-forensic align-middle mb-0">
+                      <thead>
+                        <tr>
+                          <th>#</th>
+                          <th>Contacto</th>
+                          <th>Eventos</th>
+                          <th>Desglose</th>
+                          <th>Tiempo</th>
+                          <th>Último Contacto</th>
+                          <th>Acción</th>
+                        </tr>
+                      </thead>
+                      <tbody id="target-top-contacts-body"></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-4">
+                <div class="card-forensic">
+                  <div class="card-header">
+                    <strong>Antenas Más Frecuentadas</strong>
+                  </div>
+                  <div class="table-responsive">
+                    <table class="table table-forensic align-middle mb-0">
+                      <thead>
+                        <tr>
+                          <th>Celda</th>
+                          <th>Frecuencia</th>
+                          <th>Ubicación</th>
+                        </tr>
+                      </thead>
+                      <tbody id="target-top-antennas-body"></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Secuencia automática de antenas -->
+            <div class="card-forensic p-4 mt-4">
+              <div class="card-header border-0 pb-3 pt-0 px-0">
+                <span class="fw-bold"><i class="bi bi-signpost-split text-primary me-1"></i> Lectura automática de la secuencia de antenas</span>
+              </div>
+              <div id="target-route-summary"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- VISTA 5: COMPARADOR Y VÍNCULOS -->
+        <section id="view-comparator" class="view-section d-none">
+          <div class="mb-4">
+            <h4 class="fw-bold text-navy mb-1">Comparador y Análisis de Vínculos Telefónicos</h4>
+            <p class="text-muted small mb-0">Cruce entre dos números: llamadas mutuas, contactos comunes, antenas compartidas, última conexión registrada y silencios</p>
+          </div>
+
+          <div class="card-forensic p-4 mb-4">
+            <div class="row g-3">
+              <div class="col-md-5">
+                <label class="form-label fw-bold">Número A:</label>
+                <input type="text" id="comparator-phone-a" class="form-control form-control-lg font-monospace" placeholder="6561112233" />
+              </div>
+              <div class="col-md-5">
+                <label class="form-label fw-bold">Número B:</label>
+                <input type="text" id="comparator-phone-b" class="form-control form-control-lg font-monospace" placeholder="6569998877" />
+              </div>
+              <div class="col-md-2 d-flex align-items-end">
+                <button id="btn-run-comparator" class="btn btn-primary btn-lg w-100">
+                  <i class="bi bi-intersect me-1"></i> Comparar
+                </button>
+              </div>
+              <div class="col-md-5">
+                <label class="form-label small fw-bold mb-1" for="comparator-ref-time">Hora de referencia (opcional, hora de Juárez):</label>
+                <input type="datetime-local" id="comparator-ref-time" class="form-control form-control-sm font-monospace" />
+                <div class="form-text">Ej. la última vez que la persona fue vista. Se muestra la última antena de cada línea antes de esa hora.</div>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label small fw-bold mb-1" for="comparator-silence-hours">Silencio a partir de:</label>
+                <select id="comparator-silence-hours" class="form-select form-select-sm">
+                  <option value="2">2 horas</option>
+                  <option value="6" selected>6 horas</option>
+                  <option value="12">12 horas</option>
+                  <option value="24">24 horas</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div id="comparator-results-container" class="d-none">
+            <!-- Alerta de Vínculo Directo -->
+            <div id="comparator-direct-alert" class="alert alert-secondary"></div>
+
+            <!-- Tabla de Comunicaciones Directas -->
+            <div class="card-forensic mb-4">
+              <div class="card-header">
+                <strong>Comunicaciones Directas entre Ambos Números</strong>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-forensic align-middle mb-0">
+                  <thead>
+                    <tr>
+                      <th>Fecha/Hora</th>
+                      <th>Emisor</th>
+                      <th></th>
+                      <th>Receptor</th>
+                      <th>Tipo / Duración</th>
+                      <th>Antena</th>
+                    </tr>
+                  </thead>
+                  <tbody id="comparator-direct-events-body"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Intermediarios y Celdas Comunes -->
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <div class="card-forensic">
+                  <div class="card-header bg-light">
+                    <strong>Contactos telefónicos en común</strong>
+                  </div>
+                  <div class="list-group list-group-flush" id="comparator-common-contacts"></div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="card-forensic">
+                  <div class="card-header bg-light">
+                    <strong>Antenas compartidas (con el Δ de tiempo más cercano)</strong>
+                  </div>
+                  <div class="list-group list-group-flush" id="comparator-common-antennas"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Última conexión registrada y silencios -->
+            <div class="card-forensic p-4 mb-4">
+              <div class="card-header border-0 pb-3 pt-0 px-0">
+                <span class="fw-bold"><i class="bi bi-clock-history text-primary me-1"></i> Última conexión registrada y silencios</span>
+              </div>
+              <div id="comparator-lastconn"></div>
+            </div>
+
+            <!-- Línea de Tiempo Sincronizada -->
+            <div class="card-forensic p-4">
+              <div class="card-header border-0 pb-3 pt-0 px-0">
+                <span class="fw-bold">Línea de Tiempo Cronológica Sincronizada</span>
+              </div>
+              <div class="timeline-container" id="comparator-timeline-container"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- VISTA: RED DE VÍNCULOS FORENSE (i2 / UAYC) -->
+        <section id="view-network" class="view-section d-none">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <h4 class="fw-bold text-navy mb-1">
+                <i class="bi bi-diagram-2-fill text-warning me-1"></i> Hoja Forense y Red de Vínculos (Estilo i2 Analyst's Notebook)
+              </h4>
+              <p class="text-muted small mb-0">Extracción técnica de telecomunicaciones con tráfico de datos, enlaces bidireccionales y formato pericial</p>
+            </div>
+            <div class="d-flex gap-2">
+              <button id="btn-export-network-pdf" class="btn btn-sm btn-danger">
+                <i class="bi bi-file-earmark-pdf-fill me-1"></i> Imprimir / PDF
+              </button>
+              <button id="btn-export-network-png" class="btn btn-sm btn-outline-danger">
+                <i class="bi bi-camera-fill me-1"></i> PNG Alta Res.
+              </button>
+              <button id="btn-export-network-svg" class="btn btn-sm btn-outline-dark">
+                <i class="bi bi-filetype-svg me-1"></i> SVG
+              </button>
+            </div>
+          </div>
+
+          <!-- Controles y Criterios de Ordenamiento de la Red -->
+          <div class="card-forensic p-3 mb-3">
+            <div class="row g-2 align-items-end">
+              <div class="col-md-3">
+                <label class="form-label small fw-bold mb-1">Formato de la Hoja Forense:</label>
+                <select id="network-layout-format" class="form-select form-select-sm border-danger fw-bold">
+                  <option value="radial_i2" selected>📄 Hoja de Extracción i2 con Tráfico de Datos (1 Página)</option>
+                  <option value="bipolar_uayc">📊 Diagrama Columnar Bipolar (UAYC Estándar)</option>
+                </select>
+              </div>
+              <div class="col-md-2">
+                <label class="form-label small fw-bold mb-1">Número Blanco:</label>
+                <div class="input-group input-group-sm">
+                  <input type="text" id="network-target-phone" class="form-control font-monospace" value="6271218386" placeholder="6271218386" />
+                  <button id="btn-render-network" class="btn btn-primary" title="Generar hoja forense">
+                    <i class="bi bi-arrow-clockwise"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="col-md-2">
+                <label class="form-label small fw-bold mb-1">Criterio:</label>
+                <select id="network-filter-criterion" class="form-select form-select-sm">
+                  <option value="interactions" selected>Más interacciones</option>
+                  <option value="antennas">Por conexiones a antena</option>
+                </select>
+              </div>
+              <div class="col-md-2">
+                <label class="form-label small fw-bold mb-1">Sentido Tráfico:</label>
+                <select id="network-filter-traffic" class="form-select form-select-sm">
+                  <option value="all">Todo (Salientes y Entrantes)</option>
+                  <option value="outgoing">Solo Salientes (Rojo)</option>
+                  <option value="incoming">Solo Entrantes (Azul)</option>
+                </select>
+              </div>
+              <div class="col-md-2">
+                <label class="form-label small fw-bold mb-1">Fecha del Hecho:</label>
+                <input type="date" id="network-date-incident" class="form-control form-control-sm" />
+              </div>
+              <div class="col-md-1">
+                <label class="form-label small fw-bold mb-1">Antena:</label>
+                <select id="network-antenna-select" class="form-select form-select-sm">
+                  <option value="">Todas las Antenas</option>
+                </select>
+              </div>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mt-2 pt-2 border-top">
+              <span id="network-stats-summary" class="small text-muted">Cargando relaciones de la red...</span>
+              <div class="small">
+                <span class="badge bg-danger me-2">Rojo: Saliente (LL-S / M-S)</span>
+                <span class="badge bg-primary">Azul: Entrante (LL-E / M-E)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Lienzo del Diagrama Forense i2 -->
+          <div class="card-forensic p-2 bg-light text-center" style="overflow-x: auto;">
+            <div id="network-diagram-container" style="min-width: 1000px; display: inline-block;"></div>
+          </div>
+        </section>
+
+        <!-- VISTA: CRUCE MULTI-SÁBANA -->
+        <section id="view-multisheet" class="view-section d-none">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <h4 class="fw-bold text-navy mb-1">
+                <i class="bi bi-collection-fill text-success me-1"></i> Cruce y Comparación de Múltiples Sábanas Telefónicas
+              </h4>
+              <p class="text-muted small mb-0">Contraste simultáneo entre sábanas de sospechosos, víctimas y negociadores</p>
+            </div>
+            <div class="d-flex gap-2">
+              <button id="btn-load-preset-multisheet" class="btn btn-sm btn-outline-danger">
+                <i class="bi bi-lightning-charge-fill me-1"></i> Cargar Caso Multi-Sábana de Ejemplo
+              </button>
+              <button id="btn-run-multisheet-cross" class="btn btn-sm btn-success">
+                <i class="bi bi-intersect me-1"></i> Ejecutar Cruce de Sábanas
+              </button>
+            </div>
+          </div>
+
+          <!-- Sábanas Registradas -->
+          <div class="card-forensic p-3 mb-4">
+            <h6 class="fw-bold text-navy border-bottom pb-2 mb-3">Sábanas Disponibles para Cruce:</h6>
+            <div id="multisheet-list-container"></div>
+          </div>
+
+          <!-- Resultados del Cruce -->
+          <div id="multisheet-results-container" class="d-none"></div>
+        </section>
+
+        <!-- VISTA: COMPORTAMIENTO CELULAR Y ANÁLISIS DE DATOS -->
+        <section id="view-behavior" class="view-section d-none">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <h4 class="fw-bold text-navy mb-1">
+                <i class="bi bi-activity text-danger me-1"></i> Análisis Forense de Comportamientos Celulares
+              </h4>
+              <p class="text-muted small mb-0">Detección algorítmica de teléfonos desechables (burners), ráfagas nocturnas y silencios radiales</p>
+            </div>
+            <button id="btn-run-behavior-audit" class="btn btn-sm btn-primary">
+              <i class="bi bi-arrow-repeat me-1"></i> Actualizar Auditoría de Conducta
+            </button>
+          </div>
+
+          <div id="behavior-analysis-container"></div>
+        </section>
+
+        <!-- VISTA 6: MAPA DE ANTENAS Y LÍNEA DE TIEMPO INTERACTIVA -->
+        <section id="view-map" class="view-section d-none">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <h4 class="fw-bold text-navy mb-1">
+                <i class="bi bi-geo-alt-fill text-danger me-1"></i> Mapeo Táctico de Celdas y Línea de Tiempo Interactiva
+              </h4>
+              <p class="text-muted small mb-0">Georreferenciación de celdas, sectores de azimut y reconstrucción dinámica de desplazamientos</p>
+            </div>
+            <span class="badge bg-navy fs-6" id="map-antennas-count">0 antenas ubicadas</span>
+          </div>
+
+          <!-- Criterios de Georreferenciación -->
+          <div class="card-forensic p-3 mb-3">
+            <div class="row g-2 align-items-center">
+              <div class="col-md-2">
+                <label class="form-label small fw-bold mb-1">Filtrar por Número:</label>
+                <input type="text" id="map-filter-phone" class="form-control form-control-sm" placeholder="Secuencia de antenas de un número..." />
+              </div>
+              <div class="col-md-2">
+                <label class="form-label small fw-bold mb-1">Antena / Celda Específica:</label>
+                <select id="map-filter-antenna" class="form-select form-select-sm">
+                  <option value="">Todas las Antenas</option>
+                </select>
+              </div>
+              <div class="col-md-2">
+                <label class="form-label small fw-bold mb-1">Fecha del Hecho:</label>
+                <input type="date" id="map-filter-date" class="form-control form-control-sm" />
+              </div>
+              <div class="col-md-2">
+                <label class="form-label small fw-bold mb-1">Operador Celular:</label>
+                <select id="map-filter-operator" class="form-select form-select-sm">
+                  <option value="">Todos los Operadores</option>
+                  <option value="Telcel">Telcel (Azul)</option>
+                  <option value="AT&T">AT&T (Azul Cielo)</option>
+                  <option value="Movistar">Movistar (Celeste)</option>
+                </select>
+              </div>
+              <div class="col-md-2">
+                <div class="form-check mt-3">
+                  <input class="form-check-input" type="checkbox" id="map-toggle-trajectory" checked />
+                  <label class="form-check-label small fw-bold" for="map-toggle-trajectory">
+                    Secuencia de antenas
+                  </label>
+                </div>
+              </div>
+              <div class="col-md-2">
+                <div class="form-check mt-3">
+                  <input class="form-check-input" type="checkbox" id="map-toggle-sectors" checked />
+                  <label class="form-check-label small fw-bold" for="map-toggle-sectors">
+                    Haz Azimut (60°)
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Contenedor Leaflet -->
+          <div class="card-forensic p-1 mb-3">
+            <div id="leaflet-map" style="height: 520px;"></div>
+          </div>
+
+          <!-- LÍNEA DE TIEMPO INTERACTIVA Y SCRUBBER FORENSE -->
+          <div class="card-forensic p-3 bg-white border">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span class="fw-bold text-navy small">
+                <i class="bi bi-clock-history text-danger me-1"></i> Línea de Tiempo Cronológica Interactiva
+              </span>
+              <div class="d-flex align-items-center gap-2">
+                <button id="btn-timeline-reset" class="btn btn-xs btn-outline-secondary py-1 px-2" title="Reiniciar a inicio">
+                  <i class="bi bi-skip-start-fill"></i>
+                </button>
+                <button id="btn-timeline-prev" class="btn btn-xs btn-outline-primary py-1 px-2" title="Paso anterior">
+                  <i class="bi bi-chevron-left"></i>
+                </button>
+                <button id="btn-timeline-play" class="btn btn-xs btn-danger py-1 px-3 fw-bold">
+                  <i class="bi bi-play-fill"></i> Reproducir
+                </button>
+                <button id="btn-timeline-next" class="btn btn-xs btn-outline-primary py-1 px-2" title="Paso siguiente">
+                  <i class="bi bi-chevron-right"></i>
+                </button>
+                <span id="timeline-total-steps" class="badge bg-secondary font-monospace ms-2">0 pasos</span>
+              </div>
+            </div>
+
+            <!-- Slider / Scrubber -->
+            <input type="range" class="form-range" id="timeline-slider" min="0" max="100" value="0" />
+
+            <!-- Estado del paso actual -->
+            <div id="timeline-current-status" class="alert alert-light border py-2 px-3 mb-0 small text-truncate">
+              Seleccione un punto en la línea de tiempo o presione <strong>"Reproducir"</strong> para iniciar la reconstrucción táctica paso a paso.
+            </div>
+          </div>
+        </section>
+
+        <!-- VISTA: VALIDADOR DE HASH Y CADENA DE CUSTODIA (CNPP) -->
+        <section id="view-custody" class="view-section d-none">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <h4 class="fw-bold text-navy mb-1">
+                <i class="bi bi-shield-check text-warning me-1"></i> Validador y Comparador de Hash & Cadena de Custodia
+              </h4>
+              <p class="text-muted small mb-0">Verificación de inalterabilidad probatoria (SHA-256 / MD5) y generación de actas oficiales (CNPP)</p>
+            </div>
+            <button id="btn-print-custody-act" class="btn btn-sm btn-outline-dark">
+              <i class="bi bi-printer-fill me-1"></i> Imprimir Acta Oficial
+            </button>
+          </div>
+
+          <div class="row g-3 mb-4">
+            <!-- Panel Validador y Comparador de Hash -->
+            <div class="col-lg-6">
+              <div class="card-forensic p-3 h-100">
+                <h6 class="fw-bold text-navy border-bottom pb-2 mb-3">
+                  <i class="bi bi-hash text-danger me-1"></i> 1. Cálculo y Cotejo de Hash Criptográfico
+                </h6>
+
+                <div class="mb-3">
+                  <label class="form-label small fw-bold">Seleccionar Archivo de Evidencia (Sábana / Disco):</label>
+                  <input type="file" id="custody-file-input" class="form-control form-control-sm" />
+                </div>
+
+                <div id="custody-computed-hashes" class="mb-3">
+                  <div class="alert alert-light border small text-muted mb-0">
+                    Seleccione un archivo para extraer sus huellas digitales criptográficas (SHA-256, SHA-1 y MD5).
+                  </div>
+                </div>
+
+                <div class="border-top pt-3">
+                  <label class="form-label small fw-bold">Comparar con Hash de Referencia (Oficio Ministerial):</label>
+                  <div class="input-group input-group-sm mb-2">
+                    <input type="text" id="custody-reference-hash" class="form-control font-monospace" placeholder="Pegar hash provisto por el concesionario o juez..." />
+                    <button id="btn-verify-hash-match" class="btn btn-primary fw-bold">
+                      <i class="bi bi-check2-circle"></i> Cotejar
+                    </button>
+                  </div>
+                  <div id="custody-comparison-result"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Panel Formulario Cadena de Custodia -->
+            <div class="col-lg-6">
+              <div class="card-forensic p-3 h-100">
+                <h6 class="fw-bold text-navy border-bottom pb-2 mb-3">
+                  <i class="bi bi-file-earmark-text-fill text-primary me-1"></i> 2. Datos para el Registro de Cadena de Custodia
+                </h6>
+
+                <div class="row g-2 mb-3">
+                  <div class="col-md-6">
+                    <label class="form-label small fw-bold">Causa / Carpeta (NUC):</label>
+                    <input type="text" id="custody-form-nuc" class="form-control form-control-sm" value="EXP-2026-084-SEC" />
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label small fw-bold">Entidad o Concesionario Emisor:</label>
+                    <select id="custody-form-carrier" class="form-select form-select-sm">
+                      <option value="Telcel (Radiomóvil Dipsa S.A. de C.V.)" selected>Telcel (Radiomóvil Dipsa)</option>
+                      <option value="AT&T Comunicaciones Digitales">AT&T Comunicaciones</option>
+                      <option value="Telefónica Movistar México">Telefónica Movistar</option>
+                      <option value="Juzgado de Control del Distrito Judicial Bravos">Juzgado de Control (Orden Judicial)</option>
+                    </select>
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label small fw-bold">Nombre del Servidor Público / Apoderado que Entrega:</label>
+                    <input type="text" id="custody-form-deliverer" class="form-control form-control-sm" value="Lic. Alejandro Morales (Apoderado Legal de Telecomunicaciones)" />
+                  </div>
+                </div>
+
+                <div class="text-end">
+                  <button id="btn-generate-custody-act" class="btn btn-danger btn-sm">
+                    <i class="bi bi-shield-fill-check me-1"></i> Generar Acta Oficial de Custodia (CNPP)
+                  </button>
+                </div>
+
+                <!-- Historial Reciente de Custodia -->
+                <div class="mt-3 border-top pt-2">
+                  <span class="small fw-bold text-muted">Últimos Registros Fijados:</span>
+                  <div class="table-responsive mt-1" style="max-height: 140px; overflow-y: auto;">
+                    <table class="table table-sm table-bordered small">
+                      <thead class="table-light">
+                        <tr>
+                          <th>Fecha</th>
+                          <th>NUC</th>
+                          <th>Archivo</th>
+                          <th>Hash</th>
+                          <th>Receptor</th>
+                        </tr>
+                      </thead>
+                      <tbody id="custody-history-table-body"></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Documento Previo del Acta Oficial -->
+          <div id="custody-act-preview" class="card-forensic p-0">
+            <div class="alert alert-light border text-center p-4 text-muted mb-0">
+              Complete los datos y haga clic en <strong>"Generar Acta Oficial de Custodia"</strong> para emitir el formato ministerial conforme al CNPP.
+            </div>
+          </div>
+        </section>
+
+        <!-- VISTA: FICHA DE IDENTIFICACIÓN PERSONAL (OSINT / PIWEB) -->
+        <section id="view-osint" class="view-section d-none">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <h4 class="fw-bold text-navy mb-1">
+                <i class="bi bi-person-vcard-fill text-info me-1"></i> Automatización de Fichas de Identificación Personal (OSINT & PIWEB)
+              </h4>
+              <p class="text-muted small mb-0">Fijación forense con hash SHA-256, límites de privacidad (Art. 20 Const.) y padrones oficiales</p>
+            </div>
+            <div class="d-flex gap-2">
+              <button id="btn-export-osint-excel" class="btn btn-sm btn-outline-success">
+                <i class="bi bi-file-earmark-excel me-1"></i> Exportar a Excel
+              </button>
+              <button id="btn-export-osint-word" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-file-earmark-word me-1"></i> Exportar a Word
+              </button>
+              <button id="btn-export-osint-pdf" class="btn btn-sm btn-danger">
+                <i class="bi bi-file-earmark-pdf me-1"></i> Imprimir / PDF
+              </button>
+            </div>
+          </div>
+
+          <!-- Selector de Sujeto / Expediente -->
+          <div class="card-forensic p-3 mb-3">
+            <div class="row align-items-center g-2">
+              <div class="col-md-5">
+                <label class="form-label small fw-bold mb-1">Seleccionar Persona Sujeta a Investigación:</label>
+                <select id="osint-preset-select" class="form-select form-select-sm">
+                  <option value="subj_edgar_salazar" selected>Edgar Manuel Salazar Zubiate (NUC: COL/046/2026 - Padrón SH Chihuahua)</option>
+                  <option value="subj_sergio_baca">Sergio Baca Méndez (NUC: 32-2025-2560 - Agente de Policía / Parral)</option>
+                </select>
+              </div>
+              <div class="col-md-7 text-md-end">
+                <span class="badge bg-light text-dark border p-2">
+                  <i class="bi bi-shield-check text-success me-1"></i>
+                  Cumplimiento con Ley de Protección de Datos Personales del Estado de Chihuahua
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Búsqueda de ficha por número de teléfono -->
+          <div class="card-forensic p-3 mb-3">
+            <label class="form-label small fw-bold mb-1"><i class="bi bi-telephone-inbound me-1"></i> Generar ficha por número de teléfono</label>
+            <div class="input-group input-group-sm" style="max-width: 520px;">
+              <input type="text" id="osint-lookup-phone" class="form-control font-monospace" placeholder="Ej. 6561234567" />
+              <button id="btn-osint-lookup-phone" class="btn btn-primary"><i class="bi bi-search me-1"></i> Generar ficha</button>
+            </div>
+            <div class="form-text">Si el número está en una sábana cargada, arma una ficha preliminar (contactos, antenas, actividad). La identidad y los vehículos se confirman por la consulta oficial (RENAPO/REPUVE).</div>
+          </div>
+
+          <!-- Contenedor de la Ficha Técnica Automatizada -->
+          <div id="osint-ficha-container"></div>
+        </section>
+
+        <!-- VISTA: RECONOCIMIENTO DE VEHÍCULOS / PLACAS -->
+        <section id="view-vehicle" class="view-section d-none">
+          <div class="mb-3">
+            <h4 class="fw-bold text-navy mb-1"><i class="bi bi-car-front-fill text-secondary me-1"></i> Reconocimiento de vehículos y placas</h4>
+            <p class="text-muted small mb-0">Lee la placa de una imagen (OCR) y la cruza con las fichas OSINT y, de forma simulada, con REPUVE</p>
+          </div>
+          <div id="vehicle-id-content"></div>
+        </section>
+
+        <!-- VISTA 7: REPORTES PERICIALES (PDF) -->
+        <section id="view-reports" class="view-section d-none">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h4 class="fw-bold text-navy mb-1">Generador de Dictámenes e Informes Periciales</h4>
+              <p class="text-muted small mb-0">Emisión formal con valor probatorio y cadena de custodia para juzgados</p>
+            </div>
+            <div class="d-flex gap-2">
+              <button id="btn-preview-report" class="btn btn-outline-primary">
+                <i class="bi bi-eye-fill me-1"></i> Vista Previa
+              </button>
+              <button id="btn-generate-pdf" class="btn btn-danger">
+                <i class="bi bi-file-earmark-pdf-fill me-1"></i> Descargar Dictamen en PDF
+              </button>
+            </div>
+          </div>
+
+          <div class="card-forensic p-3 mb-4">
+            <div class="row g-3">
+              <div class="col-md-4">
+                <label class="form-label fw-bold">Expediente:</label>
+                <select id="report-expedition-select" class="form-select">
+                  <option value="EXP-2026-084-SEC">EXP-2026-084-SEC (Secuestro Cd. Juárez)</option>
+                  <option value="EXP-2026-019-EXT">EXP-2026-019-EXT (Extorsión Pronaf)</option>
+                </select>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-bold">Número Enfoque (Opcional):</label>
+                <input type="text" id="report-target-phone" class="form-control" placeholder="Dejar en blanco para informe general" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Documento Previo -->
+          <div id="report-preview-document" class="card-forensic p-0">
+            <div class="text-center py-5 text-muted">
+              Haga clic en <strong>"Vista Previa"</strong> para compilar el dictamen oficial con datos de la sábana.
+            </div>
+          </div>
+        </section>
+
+        <!-- VISTA 8: PANEL ADMIN & AUDITORÍA -->
+        <section id="view-admin" class="view-section d-none">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h4 class="fw-bold text-navy mb-1">Control de Usuarios y Auditoría de Seguridad</h4>
+              <p class="text-muted small mb-0">Bitácora legal inmutable conforme a estándares policiales y gestión de roles</p>
+            </div>
+            <div class="d-flex gap-2">
+              <button id="btn-add-user" class="btn btn-sm btn-primary">
+                <i class="bi bi-person-plus-fill me-1"></i> Alta de Oficial
+              </button>
+              <button id="btn-clear-db-demo" class="btn btn-sm btn-outline-warning">
+                <i class="bi bi-arrow-counterclockwise me-1"></i> Recargar Dataset Demo
+              </button>
+            </div>
+          </div>
+
+          <!-- Métricas de Cuota Firestore Gratuito -->
+          <div class="card-forensic p-3 mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <span class="fw-bold small">Uso de Almacenamiento Forense (Plan Gratuito Spark / Local):</span>
+              <span class="small text-muted" id="admin-quota-text">0 de 10,000 registros</span>
+            </div>
+            <div class="progress" style="height: 8px;">
+              <div id="admin-quota-progress" class="progress-bar bg-primary" role="progressbar" style="width: 5%;"></div>
+            </div>
+          </div>
+
+          <!-- Lista de Usuarios -->
+          <div class="card-forensic mb-4">
+            <div class="card-header bg-light">
+              <strong>Padrón de Personal Autorizado (Máx 20 en MVP)</strong>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-forensic align-middle mb-0">
+                <thead>
+                  <tr>
+                    <th>Oficial / Correo</th>
+                    <th>Gafete Pericial</th>
+                    <th>Adscripción</th>
+                    <th>Rol Actual</th>
+                    <th>Último Acceso</th>
+                    <th class="text-end">Modificar Rol</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-users-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Bitácora de Auditoría -->
+          <div class="card-forensic">
+            <div class="card-header d-flex justify-content-between align-items-center bg-light">
+              <strong>Bitácora Inmutable de Actividades y Cadena de Custodia</strong>
+              <button id="btn-refresh-audit" class="btn btn-xs btn-outline-secondary">Actualizar</button>
+            </div>
+            <div class="table-responsive" style="max-height: 380px; overflow-y: auto;">
+              <table class="table table-forensic align-middle mb-0">
+                <thead>
+                  <tr>
+                    <th>Fecha / Hora</th>
+                    <th>Usuario</th>
+                    <th>Acción</th>
+                    <th>Detalle</th>
+                    <th>Origen IP</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-audit-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- MODAL DE DETALLE FORENSE DE LLAMADA -->
+  <div class="modal fade" id="recordDetailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content card-forensic">
+        <div class="modal-header bg-navy text-white" style="background-color: #001f3f;">
+          <h5 class="modal-title fs-6">
+            <i class="bi bi-broadcast-pin text-warning me-2"></i>
+            Detalle Forense del Registro
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body p-4" id="record-detail-modal-body"></div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE INSTRUCCIONES DE USO DEL EXPLORADOR FORENSE -->
+  <div class="modal fade" id="explorerInstructionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content card-forensic">
+        <div class="modal-header bg-navy text-white" style="background-color: #001f3f;">
+          <h5 class="modal-title fs-6">
+            <i class="bi bi-journal-bookmark-fill text-warning me-2"></i>
+            Protocolo de Operación e Instrucciones del Explorador CDR
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body p-4 text-dark">
+          <div class="alert alert-info border d-flex align-items-center gap-2 mb-3 py-2 small">
+            <i class="bi bi-info-circle-fill fs-5 text-primary"></i>
+            <span>
+              Este módulo permite a los analistas de la Unidad Antisecuestros inspeccionar, filtrar y correlacionar miles de registros telefónicos (CDR) con valor probatorio pericial.
+            </span>
+          </div>
+
+          <div class="row g-3">
+            <!-- Guía 1 -->
+            <div class="col-md-6">
+              <div class="card h-100 border p-3 bg-light">
+                <h6 class="fw-bold text-navy mb-2">
+                  <span class="badge bg-primary me-1">1</span> Filtrado por Números y Búsqueda
+                </h6>
+                <ul class="small mb-0 text-muted ps-3">
+                  <li><strong>Búsqueda Rápida:</strong> Escriba cualquier fragmento de número o código de celda para filtrar en tiempo real.</li>
+                  <li><strong>Número Origen / Destino:</strong> Ingrese los 10 dígitos o la lada local (ej. <code>656</code> para Juárez, <code>627</code> para Parral).</li>
+                  <li><strong>Botón 🔍 Rápido:</strong> Al dar clic en el ícono de la lupa junto a cualquier número, el sistema lo envía automáticamente al <em>Analizador Forense</em> o a la <em>Red de Vínculos</em>.</li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Guía 2 -->
+            <div class="col-md-6">
+              <div class="card h-100 border p-3 bg-light">
+                <h6 class="fw-bold text-navy mb-2">
+                  <span class="badge bg-danger me-1">2</span> Filtros Cronológicos (Fecha y Hora)
+                </h6>
+                <ul class="small mb-0 text-muted ps-3">
+                  <li><strong>Fecha del Hecho:</strong> Fije el día exacto de la privación de la libertad o extorsión para descartar tráfico irrelevante.</li>
+                  <li><strong>Turno de Madrugada (00:00 - 05:59):</strong> Resalta automáticamente las filas con fondo amarillo y etiqueta <code>🌙 00-05h</code>, horario característico de llamadas de rescate y guardias de células.</li>
+                  <li><strong>Rango Horario:</strong> Permite acotar ventanas de minutos u horas exactas (ej. de 14 a 16 hrs).</li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Guía 3 -->
+            <div class="col-md-6">
+              <div class="card h-100 border p-3 bg-light">
+                <h6 class="fw-bold text-navy mb-2">
+                  <span class="badge bg-warning text-dark me-1">3</span> Detalle Forense de Antena y Azimut
+                </h6>
+                <ul class="small mb-0 text-muted ps-3">
+                  <li>Haga clic en el botón <strong>"Detalle"</strong> de cualquier fila para consultar el Cell ID oficial.</li>
+                  <li>Se muestran las <strong>coordenadas geográficas exactas (Lat/Lng)</strong> de la torre celular y su <strong>azimut</strong> (ángulo de cobertura del sector).</li>
+                  <li>Incluye enlace directo a vista satelital para identificar inmuebles o predios en la zona.</li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Guía 4 -->
+            <div class="col-md-6">
+              <div class="card h-100 border p-3 bg-light">
+                <h6 class="fw-bold text-navy mb-2">
+                  <span class="badge bg-success me-1">4</span> Exportación y Cadena de Custodia
+                </h6>
+                <ul class="small mb-0 text-muted ps-3">
+                  <li>El botón <strong>"Exportar a CSV"</strong> extrae exclusivamente la vista depurada con los filtros activos.</li>
+                  <li>Formato estructurado con codificación UTF-8 con BOM para apertura inmediata en Microsoft Excel.</li>
+                  <li>Los números telefónicos se exportan como formato de texto estricto para evitar pérdidas de ceros a la izquierda.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer bg-light">
+          <button type="button" class="btn btn-primary btn-sm px-4" data-bs-dismiss="modal">
+            <i class="bi bi-check-lg me-1"></i> Entendido
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE INSTRUCCIONES Y FORMATOS DE SÁBANA -->
+  <div class="modal fade" id="importFormatsModal" tabindex="-1" aria-labelledby="importFormatsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg">
+        <div class="modal-header bg-navy text-white">
+          <h5 class="modal-title fw-bold" id="importFormatsModalLabel">
+            <i class="bi bi-file-earmark-check-fill text-warning me-2"></i>
+            Guía de Formatos Aceptados en SABTEL
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <div class="border rounded p-3 h-100 bg-light">
+                <div class="fw-bold text-navy mb-2"><i class="bi bi-filetype-csv text-primary fs-5 me-1"></i> Archivos CSV</div>
+                <ul class="small text-muted ps-3 mb-0">
+                  <li><strong>Delimitadores:</strong> Comas (<code>,</code>), Punto y coma (<code>;</code> de Excel), Tabulaciones (<code>\t</code>).</li>
+                  <li><strong>Codificación:</strong> UTF-8, Latin-1 / Windows-1252 (con acentos automáticos).</li>
+                  <li><strong>Preámbulos:</strong> Ignora automáticamente títulos o metadatos superiores del operador.</li>
+                </ul>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="border rounded p-3 h-100 bg-light">
+                <div class="fw-bold text-navy mb-2"><i class="bi bi-filetype-xlsx text-success fs-5 me-1"></i> Excel XLSX / XLS</div>
+                <ul class="small text-muted ps-3 mb-0">
+                  <li><strong>Hojas:</strong> Lee directamente libros nativos de Microsoft Excel o LibreOffice.</li>
+                  <li><strong>Formatos:</strong> Conversión directa de números a texto de 10 dígitos sin notación científica.</li>
+                  <li><strong>Fechas:</strong> Detección de formatos de fecha estándar y seriales de Excel.</li>
+                </ul>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="border rounded p-3 h-100 bg-light">
+                <div class="fw-bold text-navy mb-2"><i class="bi bi-filetype-pdf text-danger fs-5 me-1"></i> PDF Forense / i2</div>
+                <ul class="small text-muted ps-3 mb-0">
+                  <li><strong>Extracción:</strong> Lee reportes digitales de telefonía celular, extracciones i2 Analyst y facturas.</li>
+                  <li><strong>Parser inteligente:</strong> Identifica números, llamadas entrantes/salientes, mensajes y sesiones de datos 3600s.</li>
+                  <li><strong>OCR / Pegado:</strong> Pestaña de texto directo para escaneos físicos.</li>
+                </ul>
+              </div>
+            </div>
+            <div class="col-12 mt-3">
+              <div class="alert alert-info py-2 small mb-0">
+                <strong><i class="bi bi-shield-check me-1"></i> Dos Esquemas Soportados:</strong>
+                <ol class="mb-0 ps-3 mt-1">
+                  <li><strong>Esquema Bipolar:</strong> Columnas separadas para Número Origen y Número Destino.</li>
+                  <li><strong>Esquema de Línea Investigada (Telcel / i2):</strong> Una sola columna de Interlocutor + Columna de Sentido (Entrante/Saliente/Datos), anclada al número investigado (ej. <code>6271218386</code>).</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer bg-light">
+          <button type="button" class="btn btn-primary btn-sm px-4" data-bs-dismiss="modal">
+            <i class="bi bi-check-lg me-1"></i> Entendido
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIBRERÍAS DE TERCEROS DESDE CDN SEGURO -->
+  <!-- Bootstrap 5 Bundle JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Papa Parse (CSV) -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <!-- SheetJS (Excel XLSX / XLS) -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <!-- PDF.js para Lectura y Extracción de Documentos PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script>
+    if (window.pdfjsLib) {
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    }
+  </script>
+  <!-- jsPDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <!-- CONTROLADOR PRINCIPAL SABTEL -->
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

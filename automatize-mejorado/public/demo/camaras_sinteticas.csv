@@ -1,0 +1,13 @@
+id_camara,descripcion,latitud,longitud,fuente
+CAM-SIN-001,Cámara sintética Norte 01 (cruce),31.7410,-106.4460,Catálogo sintético de cámaras v0.1
+CAM-SIN-002,Cámara sintética Norte 02 (avenida),31.7380,-106.4425,Catálogo sintético de cámaras v0.1
+CAM-SIN-003,Cámara sintética Norte 03 (parque),31.7295,-106.4600,Catálogo sintético de cámaras v0.1
+CAM-SIN-004,Cámara sintética Centro 01 (plaza),31.7395,-106.4870,Catálogo sintético de cámaras v0.1
+CAM-SIN-005,Cámara sintética Centro 02 (puente),31.7430,-106.4800,Catálogo sintético de cámaras v0.1
+CAM-SIN-006,Cámara sintética Oriente 01 (bulevar),31.6950,-106.3880,Catálogo sintético de cámaras v0.1
+CAM-SIN-007,Cámara sintética Oriente 02 (gasolinera),31.6890,-106.3960,Catálogo sintético de cámaras v0.1
+CAM-SIN-008,Cámara sintética Sur 01 (acceso),31.6520,-106.4310,Catálogo sintético de cámaras v0.1
+CAM-SIN-009,Cámara sintética Sur 02 (escuela),31.6600,-106.4180,Catálogo sintético de cámaras v0.1
+CAM-SIN-010,Cámara sintética Poniente 01 (camino),31.7585,-106.5195,Catálogo sintético de cámaras v0.1
+CAM-SIN-011,Cámara sintética Poniente 02 (colonia),31.7620,-106.5260,Catálogo sintético de cámaras v0.1
+CAM-SIN-012,Cámara sintética Pronaf (museo),31.7230,-106.4430,Catálogo sintético de cámaras v0.1

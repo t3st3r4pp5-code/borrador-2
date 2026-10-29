@@ -1,0 +1,454 @@
+/**
+ * ============================================================================
+ * SABTEL - SISTEMA DE ANÁLISIS DE SÁBANAS TELEFÓNICAS
+ * ARCHIVO 2: main.css
+ * Estilos institucionales para Unidad Antisecuestros (Cd. Juárez)
+ * ============================================================================
+ */
+
+:root {
+  --color-primary: #001f3f;
+  --color-primary-light: #003d7a;
+  --color-primary-hover: #002d5a;
+  --color-bg-light: #f5f5f5;
+  --color-bg-card-light: #ffffff;
+  --color-text-dark: #333333;
+  --color-text-muted: #666666;
+  --color-border-light: #e0e0e0;
+  
+  /* Alertas tácticas */
+  --color-danger: #d32f2f;
+  --color-warning: #fbc02d;
+  --color-success: #2e7d32;
+  --color-info: #0288d1;
+
+  /* Tamaños base */
+  --font-base-size: 14px;
+  --sidebar-width: 260px;
+}
+
+[data-theme="dark"] {
+  --color-primary: #0a0e27;
+  --color-primary-light: #162447;
+  --color-primary-hover: #1f3463;
+  --color-bg-light: #0d1117;
+  --color-bg-card-light: #161b22;
+  --color-text-dark: #e6edf3;
+  --color-text-muted: #8b949e;
+  --color-border-light: #30363d;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: var(--color-bg-light);
+  color: var(--color-text-dark);
+  font-size: var(--font-base-size);
+  min-height: 100vh;
+  margin: 0;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* Tipografía de tamaño dinámico para analistas forenses */
+body.font-sm { --font-base-size: 13px; }
+body.font-md { --font-base-size: 14px; }
+body.font-lg { --font-base-size: 16px; }
+
+/* Estructura del Dashboard */
+.app-wrapper {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.sidebar {
+  width: var(--sidebar-width);
+  background-color: var(--color-primary);
+  color: #ffffff;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 1000;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.15);
+  transition: transform 0.25s ease-in-out;
+}
+
+@media (max-width: 991.98px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: -270px;
+    z-index: 99999;
+  }
+  .sidebar.show {
+    transform: translateX(270px);
+  }
+  .sidebar-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.55);
+    z-index: 99998;
+    display: none;
+  }
+  .sidebar-backdrop.show {
+    display: block;
+  }
+  .top-navbar {
+    padding: 0 0.85rem !important;
+  }
+  .content-body {
+    padding: 0.85rem !important;
+  }
+}
+
+.sidebar-header {
+  padding: 1.25rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.badge-official {
+  background: linear-gradient(135deg, #d32f2f, #b71c1c);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.65rem;
+  letter-spacing: 0.5px;
+  padding: 0.2rem 0.45rem;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.nav-forensic {
+  list-style: none;
+  padding: 0.75rem 0.5rem;
+  margin: 0;
+  flex: 1;
+}
+
+.nav-forensic .nav-item {
+  margin-bottom: 0.25rem;
+}
+
+.nav-forensic .nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem 0.85rem;
+  color: rgba(255, 255, 255, 0.75);
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.nav-forensic .nav-link:hover {
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.nav-forensic .nav-link.active {
+  color: #ffffff;
+  background-color: var(--color-primary-light);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  border-left: 4px solid #fbc02d;
+}
+
+.sidebar-footer {
+  padding: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: rgba(0, 0, 0, 0.15);
+}
+
+/* Área de contenido principal */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  background-color: var(--color-bg-light);
+}
+
+.top-navbar {
+  height: 60px;
+  background-color: var(--color-bg-card-light);
+  border-bottom: 1px solid var(--color-border-light);
+  padding: 0 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 999;
+}
+
+.content-body {
+  padding: 1.5rem;
+  flex: 1;
+}
+
+/* Tarjetas y Paneles Forenses */
+.card-forensic {
+  background-color: var(--color-bg-card-light);
+  border: 1px solid var(--color-border-light);
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease;
+}
+
+.card-forensic:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.card-forensic .card-header {
+  background-color: transparent;
+  border-bottom: 1px solid var(--color-border-light);
+  padding: 0.9rem 1.25rem;
+  font-weight: 600;
+}
+
+.stat-card {
+  padding: 1.25rem;
+  border-radius: 8px;
+  background-color: var(--color-bg-card-light);
+  border: 1px solid var(--color-border-light);
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+}
+
+.stat-card.stat-navy::after { background-color: var(--color-primary-light); }
+.stat-card.stat-danger::after { background-color: var(--color-danger); }
+.stat-card.stat-warning::after { background-color: var(--color-warning); }
+.stat-card.stat-info::after { background-color: var(--color-info); }
+
+/* Tablas Forenses */
+.table-forensic {
+  width: 100%;
+  margin-bottom: 0;
+}
+
+.table-forensic th {
+  background-color: var(--color-primary);
+  color: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 0.65rem 0.75rem;
+  border: none;
+}
+
+.table-forensic td {
+  padding: 0.6rem 0.75rem;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--color-border-light);
+  font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 0.85rem;
+}
+
+.table-forensic tr:hover {
+  background-color: rgba(0, 61, 122, 0.05);
+}
+
+/* Badges Operadores */
+.badge-telcel { background-color: #002d62; color: #fff; }
+.badge-att { background-color: #009fdb; color: #fff; }
+.badge-movistar { background-color: #00a9e0; color: #fff; }
+.badge-llamada { background-color: #198754; color: #fff; }
+.badge-sms { background-color: #6f42c1; color: #fff; }
+.badge-datos { background-color: #0dcaf0; color: #000; }
+.badge-entrante { background-color: #0d6efd; color: #fff; }
+.badge-saliente { background-color: #fd7e14; color: #fff; }
+
+/* Contenedor del Mapa Leaflet */
+#leaflet-map {
+  width: 100%;
+  height: 580px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border-light);
+  z-index: 1;
+}
+
+/* Timeline Forense */
+.timeline-container {
+  position: relative;
+  padding-left: 28px;
+}
+
+.timeline-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 12px;
+  width: 2px;
+  background-color: var(--color-border-light);
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.timeline-dot {
+  position: absolute;
+  left: -28px;
+  top: 4px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background-color: var(--color-primary-light);
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 0 2px var(--color-primary-light);
+}
+
+.timeline-dot.critical {
+  background-color: var(--color-danger);
+  box-shadow: 0 0 0 2px var(--color-danger);
+}
+
+/* Login Card Especial */
+.login-bg {
+  min-height: 100vh;
+  background: radial-gradient(circle at 10% 20%, #001f3f 0%, #0a0e27 90%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 440px;
+  background: rgba(255, 255, 255, 0.98);
+  border-radius: 12px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+  padding: 2.2rem;
+  border-top: 5px solid #001f3f;
+}
+
+/* Animaciones y utilitarios */
+.cursor-pointer { cursor: pointer; }
+.radar-pulse {
+  animation: pulse-ring 1.8s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.15); opacity: 0.4; }
+  100% { transform: scale(0.95); opacity: 0.8; }
+}
+
+/* Reporte Impreso y Exportación PDF */
+@media print {
+  @page {
+    size: letter portrait;
+    margin: 8mm;
+  }
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+  .sidebar, .top-navbar, .no-print, .btn, .pagination, #cdddm-splash-overlay, .card-header button, input, select {
+    display: none !important;
+  }
+  .main-content {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .card-forensic {
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  #forensic-i2-svg {
+    max-width: 100% !important;
+    height: auto !important;
+    page-break-inside: avoid;
+  }
+}
+
+/* Pantalla de Carga Táctica / Splash Screen CDDDM */
+#cdddm-splash-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999999;
+  background-color: #000000;
+  background-image: radial-gradient(circle at center, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.85) 100%), url('./splash-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  padding-bottom: 3.5rem;
+  transition: opacity 0.65s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.65s ease;
+  pointer-events: auto;
+}
+
+#cdddm-splash-overlay.splash-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.splash-content-box {
+  background: rgba(10, 14, 39, 0.88);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(211, 47, 47, 0.4);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(211, 47, 47, 0.2);
+  border-radius: 8px;
+  padding: 1.25rem 2rem;
+  text-align: center;
+  max-width: 480px;
+  width: 90%;
+  animation: splashFadeIn 0.4s ease-out;
+}
+
+.splash-scan-bar {
+  width: 100%;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  border-radius: 2px;
+  margin-top: 0.75rem;
+}
+
+.splash-scan-bar::after {
+  content: "";
+  display: block;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, #d32f2f, #ffffff, #d32f2f, transparent);
+  animation: scanMove 1.2s infinite ease-in-out;
+}
+
+@keyframes scanMove {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(350%); }
+}
+
+@keyframes splashFadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
